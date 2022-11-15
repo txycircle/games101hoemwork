@@ -33,7 +33,7 @@ public:
 	//Material() {};
 	Material(MaterialType type = MaterialType:: DIFFUSE, Vector3f e = Vector3f(0,0,0));
 	Vector3f GetEmission() { return M_Emission; }
-	bool HasEmission() { if (GetEmission().norm() > 0.0) return true; return false; }
+	bool HasEmission() { if (GetEmission().norm() > EPSILON) return true; return false; }
 	Vector3f Sample(const Vector3f& wi, const Vector3f& normal);
 	float pdf(const Vector3f& wi,const Vector3f&wo, const Vector3f& normal);
 	Vector3f Eval(const Vector3f& wi,const Vector3f&wo, const Vector3f& normal);

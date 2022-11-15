@@ -12,10 +12,10 @@
 
 struct BVHBuildNode;
 
-extern struct Intersection;
-extern struct Ray;
-extern class Object;
-extern class Vector3f;
+struct Intersection;
+struct Ray;
+class Object;
+class Vector3f;
 
 class BVHAccel
 {
@@ -24,7 +24,8 @@ public:
 	BVHAccel(std::vector<Object*> p):root(nullptr),primitives(p)
 	{
 		if (p.size() == 0) return;
-		RecursiveBuild(primitives);
+		root = RecursiveBuild(primitives);
+		
 	}
 	BVHBuildNode* RecursiveBuild(std::vector<Object*> p);
 	Intersection GetIntersection(const Ray& _ray, BVHBuildNode* node);

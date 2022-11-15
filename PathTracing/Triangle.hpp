@@ -44,8 +44,8 @@ class TriangleMesh :public Object
 {
 public:
 	std::vector<Triangle> Triangles;
-	std::unique_ptr<Vector3f[]> Vertices;
-	std::unique_ptr<unsigned int[]> VertexIndex;
+	//std::unique_ptr<Vector3f[]> Vertices;
+	//std::unique_ptr<unsigned int[]> VertexIndex;
 	float TriangleNums;
 	Bounds3 BoundingBox;
 	Material* m;

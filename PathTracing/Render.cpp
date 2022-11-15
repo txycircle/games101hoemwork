@@ -8,24 +8,25 @@ void Render::render(Scene& scene)
 	double imageAspectRatio = scene.width / (float)scene.height;
 	Vector3f eyePose(278, 273, -800);
 	int m = 0;
-	int spp = 1;
-	for (int i = 0; i < scene.width; ++i)
+	int spp = 16;
+	for (int j = 0; j < scene.height; ++j)
 	{
-		for (int j = 0; j < scene.height; ++j)
+		for (int i = 0; i < scene.width; ++i)
 		{
-			double x = (2 * (i + 0.5) / (scene.width - 1) - 1) * imageAspectRatio * scale;
-			double y = (1 - 2 * (j + 0.5) / (scene.height - 1)) * scale;
+			
+			double x = (2 * (i + 0.5) / (scene.width) - 1) * imageAspectRatio * scale;
+			double y = (1 - 2 * (j + 0.5) / (scene.height)) * scale;
 
-			Vector3f dir = (-x, y, -1);//ÕâÀïÒþ²ØÁË´ÓÏà»ú×ø±êÏµ±ä»»µ½ÊÀ½ç×ø±êÏµµÄ¹ý³Ì¡£ÔÚÏà»ú×ø±êÏµÏÂ×ø±êÊÇ£¨x,y,-1£©
+			Vector3f dir = Vector3f(-x, y, 1).normalized();//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ïµï¿½ä»»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ïµï¿½Ä¹ï¿½ï¿½Ì¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç£ï¿½x,y,-1ï¿½ï¿½
 			for (int a = 0; a < spp; ++a)
 			{
 				framebuffer[m] += scene.CastRay(Ray(eyePose, dir), 0) / spp;
 			}
 			++m;
 		}
-		//UpdateProgress(j / (float)scene.height);
+		UpdateProgress(j / (float)scene.height);
 	}
-	//UpdateProgress(1.f);
+	UpdateProgress(1.f);
 
 	// save framebuffer to file
 	FILE* fp = fopen("binary.ppm", "wb");

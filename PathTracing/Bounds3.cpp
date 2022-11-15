@@ -6,9 +6,9 @@
 bool Bounds3::IntersectionP(const Ray& _ray)
 {
 	std::array<int, 3> IsNegDir{ 0,0,0 };
-	if (_ray.dir.x > 0) IsNegDir[0] = 1;
-	if (_ray.dir.y > 0) IsNegDir[1] = 1;
-	if (_ray.dir.z > 0) IsNegDir[2] = 1;
+	if (_ray.dir.x >= 0) IsNegDir[0] = 1;
+	if (_ray.dir.y >= 0) IsNegDir[1] = 1;
+	if (_ray.dir.z >= 0) IsNegDir[2] = 1;
 
 	Vector3f invDir(1.0f / _ray.dir.x, 1.0f / _ray.dir.y, 1.0f / _ray.dir.z);
 
@@ -40,10 +40,10 @@ bool Bounds3::IntersectionP(const Ray& _ray)
 		texitz = t;
 	}
 
-	float tenter = std::fmin(std::fmin(tenterx, tentery), tenterz);
+	float tenter = std::fmax(std::fmax(tenterx, tentery), tenterz);
 	float texit = std::fmin(std::fmin(texitx, texity), texitz);
 
-	if (tenter <= texit && tenter >= 0)
+	if (tenter <= texit && texit > 0)
 		return true;
 	else
 		return false;

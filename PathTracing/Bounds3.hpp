@@ -6,8 +6,7 @@
 #include <array>
 #include "vector.hpp"
 
-
-extern struct Ray;
+struct Ray;
 
 
 class Bounds3 {
@@ -35,8 +34,7 @@ public:
 	double SurfaceArea();
 	Vector3f Centriod()const
 	{
-		Vector3f dis = (pMax - pMin) / 2;
-		return pMin + dis;
+		return (pMax + pMin) / 2;
 	}
 	Vector3f pMin, pMax;
 	

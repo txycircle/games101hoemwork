@@ -10,13 +10,14 @@
 
 void Scene::BuildBvh()
 {
+	std::cout<<"Building Scene Bvh"<<std::endl;
 	this->bvh = new BVHAccel(objects);
 }
 
 
 void Scene::SampleLight(Intersection & pos, float& pdf)
 {
-	//Ãæ¹âÔ´²ÉÓÃobject²ÉÑù
+	//ï¿½ï¿½ï¿½Ô´ï¿½ï¿½ï¿½ï¿½objectï¿½ï¿½ï¿½ï¿½
 	int surfacearea = 0;
 	for (auto obj : objects)
 	{
@@ -32,13 +33,12 @@ void Scene::SampleLight(Intersection & pos, float& pdf)
 	{
 		if (obj->HasEmit() == true)
 		{
+			areas += obj->GetArea();
 			if (areas >= threld)
 			{
 				obj->Sample(pos, pdf);
 				break;
 			}
-			else
-				areas += obj->GetArea();
 		}
 	}
 }
@@ -47,6 +47,8 @@ Intersection Scene::intersect(const Ray& ray)
 {
 	return this->bvh->Intersect(ray);
 }
+
+
 Vector3f Scene::CastRay(const Ray& ray, int depth)
 {
 	Vector3f returnColor(0.0, 0.0, 0.0);
@@ -55,7 +57,8 @@ Vector3f Scene::CastRay(const Ray& ray, int depth)
 	{
 		return returnColor;
 	}
-	//Óë¹âÔ´Ïà½»
+	
+	//ï¿½ï¿½ï¿½Ô´ï¿½à½»
 	if (inter.m->HasEmission()==true)
 	{
 		return inter.m->GetEmission();
@@ -63,7 +66,7 @@ Vector3f Scene::CastRay(const Ray& ray, int depth)
 
 	Vector3f wo = ray.dir.normalized();
 
-	//ÓëÎïÌåÏà½»
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½à½»
 	Intersection interLight;
 	float pdfLight = 0;
 	SampleLight(interLight, pdfLight);
@@ -73,12 +76,13 @@ Vector3f Scene::CastRay(const Ray& ray, int depth)
 	Ray rayLight(inter.coord, wi);
 
 	Intersection interCheck = intersect(rayLight);
-	if (interCheck.dis >= disLight)
+	if (interCheck.dis-disLight>=-0.001)
 	{
-		Vector3f eval = inter.m->Eval(wi,wo,inter.normal.normalized());
+		Vector3f eval = inter.m->Eval(wo,wi,inter.normal.normalized());
 		float cosine = DotProduct(inter.normal.normalized(), wi);
 		float cosineLight = DotProduct(interLight.normal.normalized(), -wi);
 		returnColor += interLight.emit * eval * cosine * cosineLight / std::pow(disLight, 2) / pdfLight;
+		//std::cout<<returnColor<<std::endl;
 	}
 
 	float p = GetRandomFloat();
@@ -89,9 +93,9 @@ Vector3f Scene::CastRay(const Ray& ray, int depth)
 		Intersection interObj = intersect(rayObj);
 		if (interObj.happend)
 		{
-			Vector3f eval = inter.m->Eval(wi, wo, inter.normal.normalized());
+			Vector3f eval = inter.m->Eval(wo, wi, inter.normal.normalized());
 			float cosine = DotProduct(inter.normal.normalized(), wi);
-			float pdf = inter.m->pdf(wi,wo,inter.normal.normalized());
+			float pdf = inter.m->pdf(wo,wi,inter.normal.normalized());
 			returnColor += CastRay(rayObj,depth+1) * eval * cosine / pdf / RussianRoulette;
 		}
 	}

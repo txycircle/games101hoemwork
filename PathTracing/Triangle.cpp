@@ -9,7 +9,7 @@ Triangle::Triangle(Vector3f _v1, Vector3f _v2, Vector3f _v3, Material* _m) :v1(_
 {
 	e1 = v2 - v1;
 	e2 = v3 - v1;
-	area = 0.5f * CrossProduct(e1, e2).norm();
+	area = 0.5f * (CrossProduct(e1, e2).norm());
 	normal = CrossProduct(e1, e2).normalized();
 	std::vector<Vector3f> vs{ v1,v2,v3 };
 	BoundingBox = Bounds3(vs);
@@ -69,6 +69,7 @@ Intersection Triangle::GetIntersection(const Ray& ray)
 
 TriangleMesh::TriangleMesh(const std::string& filename, Material* _m)
 {
+	std::cout<<"Add TriangleMesh "<<filename<<std::endl;
 	objl::Loader loader;
 	loader.LoadFile(filename);
 	area = 0;
@@ -104,11 +105,12 @@ TriangleMesh::TriangleMesh(const std::string& filename, Material* _m)
 	BoundingBox = Bounds3(pMin, pMax);
 
 	std::vector<Object*> ptrs;
-	for (auto tri : Triangles)
+	for (auto& tri : Triangles)
 	{
 		ptrs.push_back(&tri);
 		area += tri.area;
 	}
+	
 	bvh = new BVHAccel(ptrs);
 }
 
@@ -129,5 +131,6 @@ Intersection TriangleMesh::GetIntersection(const Ray& ray)
 {
 	if(this->bvh)
 		return this->bvh->Intersect(ray);
+	
 	return Intersection();
 }

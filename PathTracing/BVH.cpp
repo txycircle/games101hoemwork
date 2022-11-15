@@ -21,6 +21,8 @@ BVHBuildNode* BVHAccel::RecursiveBuild(std::vector<Object*> p)
 		node->object = obj;
 		node->area = obj->GetArea();
 		node->bounds = obj->GetBounds();
+		node->left = nullptr;
+		node->right = nullptr;
 	}
 	else
 	{
@@ -34,15 +36,15 @@ BVHBuildNode* BVHAccel::RecursiveBuild(std::vector<Object*> p)
 		else
 		{
 			Bounds3 centriod;
-			for (auto obj : p)
+			for (int i=0;i<p.size();++i)
 			{
-				centriod = Union(centriod, obj->GetBounds().Centriod());
+				centriod = Union(centriod, p[i]->GetBounds().Centriod());
 			}
 			int dim = centriod.MaxExtent();
 			switch (dim)
 			{
 				case 0:
-					std::sort(p.begin(), p.end(), [](Object* o1, Object* o2) {return o1->GetBounds().Centriod().x < o2->GetBounds().Centriod().y; });
+					std::sort(p.begin(), p.end(), [](Object* o1, Object* o2) {return o1->GetBounds().Centriod().x < o2->GetBounds().Centriod().x; });
 					break;
 				case 1:
 					std::sort(p.begin(), p.end(), [](Object* o1, Object* o2) {return o1->GetBounds().Centriod().y < o2->GetBounds().Centriod().y; });
@@ -55,10 +57,11 @@ BVHBuildNode* BVHAccel::RecursiveBuild(std::vector<Object*> p)
 			}
 			auto begining = p.begin();
 			auto ending = p.end();
-			auto middle = begining + p.size() / 2;
+			auto middle = begining + (p.size() / 2);
 
-			std::vector<Object*> pLeft(begining, middle);
-			std::vector<Object*> pRight(middle, ending);
+			
+			std::vector<Object*> pLeft = std::vector<Object*> (begining,middle);
+			std::vector<Object*> pRight = std::vector<Object*> (middle,ending);
 
 			node->left = RecursiveBuild(pLeft);
 			node->right = RecursiveBuild(pRight);
@@ -82,10 +85,16 @@ Intersection BVHAccel::GetIntersection(const Ray& _ray, BVHBuildNode* node)
 		{
 			return_intersection =  node->object->GetIntersection(_ray);
 		}
-		Intersection left = BVHAccel::GetIntersection(_ray, node->left);
-		Intersection right = BVHAccel::GetIntersection(_ray, node->right);
-		if (left.happend == false) return_intersection =  right;
-		return_intersection =  left.dis < right.dis ? left : right;
+		else
+		{
+			Intersection left = BVHAccel::GetIntersection(_ray, node->left);
+			Intersection right = BVHAccel::GetIntersection(_ray, node->right);
+			if(left.happend==true && right.happend==true)
+				return_intersection =  left.dis < right.dis ? left : right;
+			else
+				if (left.happend == false) return_intersection =  right;
+				else return_intersection = left;
+		}
 	}
 	return return_intersection;
 }

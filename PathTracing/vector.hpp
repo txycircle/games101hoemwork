@@ -5,6 +5,8 @@
 #define VECTOR_HPP
 #include <iostream>
 #include <fstream>
+#include <algorithm>
+#include <cmath>
 
 
 class Vector3f
@@ -21,7 +23,7 @@ public:
 	Vector3f operator * (const Vector3f& v)const { return Vector3f(v.x * x , v.y * y , v.z * z); }
 	Vector3f operator + (const Vector3f& v)const { return Vector3f(v.x + x , v.y + y , v.z + z); }
 	Vector3f operator - (const Vector3f& v)const { return Vector3f( x-v.x ,  y-v.y ,  z-v.z); }
-	Vector3f operator += (const Vector3f& v)const { return Vector3f( x+v.x ,  y+v.y ,  z+v.z); }
+	Vector3f operator += (const Vector3f& v) { x +=v.x,  y +=v.y, z +=v.z ; return *this;}
 	Vector3f operator -()const { return Vector3f( -x ,  -y ,  -z); }
 
 	float norm() const{ return std::sqrt(x * x + y * y + z * z); }
@@ -33,6 +35,11 @@ public:
 	friend Vector3f operator *(float &r, Vector3f& v)
 	{
 		return Vector3f(r*v.x,r*v.y,r*v.z);
+	}
+
+	friend std::ostream& operator <<(std::ostream &os,const Vector3f &v)
+	{
+		return os<<v.x<<" "<<v.y<<" "<<v.z;
 	}
 
 	static Vector3f Max(const Vector3f& v1, const Vector3f& v2)
